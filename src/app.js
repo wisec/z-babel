@@ -17,7 +17,35 @@ const AUTOSEND_SPEECH_KEY = "zbabel-autosend-speech";
 const TTS_ENABLED_KEY = "zbabel-tts-enabled";
 const THEME_KEY = "zbabel-theme";
 const LEGACY_KEY_PREFIX = "zai-";
-const SUPPORTED_UI_LANGUAGES = new Set(["English", "Italian"]);
+const SUPPORTED_UI_LANGUAGES = new Set([
+  "English", "Italian", "French", "German", "Spanish", "Portuguese", "Dutch",
+  "Polish", "Romanian", "Greek", "Russian", "Ukrainian", "Turkish", "Arabic",
+  "Hebrew", "Hindi", "Bengali", "Chinese (Simplified)", "Chinese (Traditional)",
+  "Japanese", "Korean",
+]);
+const UI_LANGUAGE_CODES = {
+  English: "en",
+  Italian: "it",
+  French: "fr",
+  German: "de",
+  Spanish: "es",
+  Portuguese: "pt",
+  Dutch: "nl",
+  Polish: "pl",
+  Romanian: "ro",
+  Greek: "el",
+  Russian: "ru",
+  Ukrainian: "uk",
+  Turkish: "tr",
+  Arabic: "ar",
+  Hebrew: "he",
+  Hindi: "hi",
+  Bengali: "bn",
+  "Chinese (Simplified)": "zh-Hans",
+  "Chinese (Traditional)": "zh-Hant",
+  Japanese: "ja",
+  Korean: "ko",
+};
 const elements = Object.fromEntries([...document.querySelectorAll("[id]")].map((node) => [node.id, node]));
 const storage = new SessionStorage();
 const mapView = new MapView(elements.map);
@@ -211,6 +239,12 @@ window.addEventListener("resize", () => {
   if (elements["debug-panel"].open) requestAnimationFrame(layoutDebug);
 });
 
+elements["menu-toggle"].addEventListener("click", () => setMobileMenu(!document.body.classList.contains("menu-open")));
+elements["mobile-menu-backdrop"].addEventListener("click", () => setMobileMenu(false));
+elements.toolbar.addEventListener("click", (event) => {
+  if (event.target.closest("button, label, select, a")) setMobileMenu(false);
+});
+
 elements.settings.addEventListener("click", openSettings);
 elements.help.addEventListener("click", () => elements["help-dialog"].showModal());
 elements["close-help"].addEventListener("click", () => elements["help-dialog"].close());
@@ -402,6 +436,12 @@ function setBusy(busy) {
     elements.send.disabled = busy || done;
     setVoiceRecording(speechRecorder.recording);
   }
+}
+
+function setMobileMenu(open) {
+  document.body.classList.toggle("menu-open", open);
+  elements["menu-toggle"].setAttribute("aria-expanded", String(open));
+  elements["mobile-menu-backdrop"].hidden = !open;
 }
 
 async function startVoiceInput(trigger) {
@@ -612,7 +652,7 @@ async function fetchLocale(language) {
 
 function applyLocale() {
   const language = uiLanguage();
-  document.documentElement.lang = language === "Italian" ? "it" : "en";
+  document.documentElement.lang = UI_LANGUAGE_CODES[language] || "en";
   for (const node of document.querySelectorAll("[data-i18n]")) {
     node.textContent = t(node.dataset.i18n);
   }
