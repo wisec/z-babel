@@ -6,6 +6,16 @@
   <title>Z-Babel</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="src/style.css">
+  <script>
+    (() => {
+      if (location.hostname !== "wisec.github.io" || !location.pathname.startsWith("/z-babel/")) return;
+      const counter = document.createElement("script");
+      counter.dataset.goatcounter = "https://z-babel.goatcounter.com/count";
+      counter.async = true;
+      counter.src = "https://gc.zgo.at/count.js";
+      document.head.append(counter);
+    })();
+  </script>
 </head>
 <body>
   <main class="app">

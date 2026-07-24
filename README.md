@@ -140,6 +140,8 @@ target-language menu has a matching locale file.
 - Saves, transcripts, map state, translations, and generated TTS audio are stored
   in browser storage.
 - No application backend receives your story or save data.
+- The public demo loads a GoatCounter page-view counter only on
+  `wisec.github.io/z-babel/`; local runs do not load analytics.
 - Gemini receives only the text or audio needed for enabled translation, STT, or
   TTS features.
 - The Gemini API key is stored only if the user enables key remembering.
