@@ -14,7 +14,8 @@
         <h1>Z-Babel</h1>
         <span id="story-name" data-i18n="loadingStory">Loading story...</span>
       </div>
-      <div class="toolbar" aria-label="Game controls" data-i18n-aria-label="gameControls">
+      <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" data-i18n="menu" data-i18n-title="menuTip">Menu</button>
+      <div id="toolbar" class="toolbar" aria-label="Game controls" data-i18n-aria-label="gameControls">
         <label class="file-button" for="story-file" data-i18n="openStory" data-i18n-title="openStoryTip">Open story</label>
         <input id="story-file" type="file" accept=".z3,.z4,.z5,.z6,.z7,.z8,.dat" hidden>
         <button id="resume" type="button" disabled data-i18n="resume" data-i18n-title="resumeTip">Resume</button>
@@ -82,6 +83,12 @@
     </section>
   </main>
 
+  <div id="mobile-menu-backdrop" class="mobile-menu-backdrop" hidden></div>
+  <div class="orientation-warning" role="status">
+    <strong data-i18n="rotateDeviceTitle">Rotate your device</strong>
+    <span data-i18n="rotateDeviceBody">Z-Babel is designed for landscape view on mobile devices.</span>
+  </div>
+
   <dialog id="settings-dialog">
     <form id="settings-form">
       <div class="dialog-heading">
@@ -120,6 +127,25 @@
           <option value="target" selected data-i18n="sameAsTarget">Same as target language</option>
           <option value="Italian">Italiano</option>
           <option value="English">English</option>
+          <option value="French">Francais</option>
+          <option value="German">Deutsch</option>
+          <option value="Spanish">Espanol</option>
+          <option value="Portuguese">Portugues</option>
+          <option value="Dutch">Nederlands</option>
+          <option value="Polish">Polski</option>
+          <option value="Romanian">Romana</option>
+          <option value="Greek">Ellinika</option>
+          <option value="Russian">Russkii</option>
+          <option value="Ukrainian">Ukrainska</option>
+          <option value="Turkish">Turkce</option>
+          <option value="Arabic">Al-Arabiyya</option>
+          <option value="Hebrew">Ivrit</option>
+          <option value="Hindi">Hindi</option>
+          <option value="Bengali">Bangla</option>
+          <option value="Chinese (Simplified)">Chinese (Simplified)</option>
+          <option value="Chinese (Traditional)">Chinese (Traditional)</option>
+          <option value="Japanese">Japanese</option>
+          <option value="Korean">Korean</option>
         </select>
       </label>
       <div class="settings-field">
