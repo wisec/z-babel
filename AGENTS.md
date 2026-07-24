@@ -1,3 +1,7 @@
+@/home/stefano/.codex/RTK.md
+
+--- project-doc ---
+
 # AGENTS.md
 
 ## Project Scope
