@@ -212,6 +212,11 @@ object names for status/map features.
 - Evaluate local or self-hosted AI providers for translation, STT, and TTS.
 - Add clearer release packaging for GitHub downloads or static hosting.
 
+## Support This Project
+
+Z-Babel is an open source project. If you find it useful, you can support its
+development through [GitHub Sponsors](https://github.com/sponsors/wisec).
+
 ## License Notes
 
 The standalone distribution includes vendored Frotz/Jericho code. Check the
