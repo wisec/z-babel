@@ -1,6 +1,6 @@
 # Z-Babel
 
-Z-Babel is a Z-Interpreter based text adventure engine [HISTORY.md] that uses AI to make classic parser-based text adventures playable
+Z-Babel is a Z-Interpreter based text adventure engine that uses AI to make classic parser-based [text adventures](HISTORY.md) playable
 through modern language interaction.
 
 Instead of forcing the player to guess terse English commands like `take lamp`
@@ -41,6 +41,11 @@ Try it here: [https://wisec.github.io/z-babel/](https://wisec.github.io/z-babel/
   restart.
 - Tracks status, inventory, command history, interpreter debug output, and an
   explored-room map.
+
+## Whats a Text Adventure Anyway?
+
+See [here](HISTORY.md)
+
 
 ## Quick Start
 
