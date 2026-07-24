@@ -19,6 +19,8 @@ This makes old interactive fiction more approachable for players who do not want
 to fight the parser in English. They can describe intent in a more natural way,
 while the game still receives the precise command form it was written for.
 
+To make this possible, Z-Babel uses a Bring Your Own Key (BYOK) model: you need to provide your own Google Gemini API key. Google currently offers a small free usage tier, which may be enough for testing and light use.
+
 The app is self contained: there is no server-side application and no backend account.
 Story files, saves, transcripts, map state, translation cache, and generated
 speech audio stay in the browser.
