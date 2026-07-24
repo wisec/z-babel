@@ -1,4 +1,4 @@
-export const GEMINI_MODELS = ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-3.5-flash-lite"];
+export const GEMINI_MODELS = ["gemini-3.5-flash-lite", "gemini-3.6-flash", "gemini-3.5-flash"];
 export const GEMINI_MODEL = GEMINI_MODELS[0];
 const PROMPT_VERSION = "python-prompts-v1";
 
