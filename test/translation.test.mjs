@@ -1,0 +1,62 @@
+import assert from "node:assert/strict";
+import {
+  GEMINI_MODEL, GeminiTranslator, commandUsesDictionary, inputSystemPrompt, outputSystemPrompt, roomNameSystemPrompt,
+} from "../src/translation.js";
+
+const values = new Map();
+const cache = {
+  getTranslation: async (key) => values.get(key) || null,
+  putTranslation: async (key, value) => values.set(key, value),
+};
+let calls = 0;
+let request;
+const fetchImpl = async (url, options) => {
+  calls += 1;
+  request = { url, options, body: JSON.parse(options.body) };
+  const system = request.body.system_instruction.parts[0].text;
+  const user = request.body.contents[0].parts[0].text;
+  const text = system.includes("location names") && user === "Fork" ? "Bivio" : "guarda";
+  return {
+    ok: true,
+    json: async () => ({
+      candidates: [{ content: { parts: [{ text: system.includes("player's language") ? " look " : ` ${text} ` }] } }],
+    }),
+  };
+};
+
+const translator = new GeminiTranslator({
+  apiKey: "secret", language: "Italian", storyId: "story", cache, fetchImpl,
+});
+assert.equal(await translator.translateOutput("look", "examine"), "guarda");
+assert.equal(await translator.translateOutput("look", "examine"), "guarda");
+assert.equal(calls, 1, "the second identical translation should use the cache");
+assert.equal(request.url.includes(GEMINI_MODEL), true);
+assert.equal(request.options.headers["x-goog-api-key"], "secret");
+assert.equal(request.body.contents[0].role, "user");
+assert.equal(request.body.generationConfig, undefined);
+assert.match(request.body.system_instruction.parts[0].text, /English-to-Italian/);
+assert.match(inputSystemPrompt(["look", "north"], "Italian"), /\[look, north\]/);
+assert.match(outputSystemPrompt("Italian"), /Preserve the tone/);
+assert.match(roomNameSystemPrompt("Italian"), /location names/);
+assert.equal(await translator.translateRoomName("Fork"), "Bivio");
+assert.equal(await translator.translateRoomName("Fork"), "Bivio");
+assert.equal(calls, 2, "room names should use their own cached translation");
+assert.equal(await translator.translateInput("guarda", ["look"]), "look");
+assert.equal(commandUsesDictionary("examine lamp", ["examin", "lamp"]), true);
+assert.equal(commandUsesDictionary("dance", ["look"]), false);
+assert.equal(await translator.transcribeAudio("UklGRg=="), "guarda");
+assert.equal(request.body.contents[0].parts[1].inline_data.mime_type, "audio/wav");
+assert.equal(request.body.contents[0].parts[1].inline_data.data, "UklGRg==");
+
+const offline = new GeminiTranslator({ language: "English", cache, fetchImpl });
+assert.equal(await offline.translateInput("north", []), "north");
+assert.equal(calls, 4, "English command input should not call Gemini");
+
+const alternative = new GeminiTranslator({
+  apiKey: "secret", language: "Italian", model: "gemini-3.5-flash", storyId: "story", cache, fetchImpl,
+});
+assert.equal(await alternative.translateOutput("look", "examine"), "guarda");
+assert.match(request.url, /models\/gemini-3\.5-flash:generateContent$/);
+assert.equal(calls, 5, "the model must be part of the translation cache key");
+
+console.log("translation tests passed");

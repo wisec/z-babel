@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Jericho WASM smoke test</title>
+  <link rel="icon" href="data:,">
+</head>
+<body>
+  <pre id="result">Running...</pre>
+  <script src="../build/jericho.js"></script>
+  <script type="module">
+    import { JerichoEngine } from "../src/jericho-engine.mjs";
+
+    const result = document.querySelector("#result");
+    try {
+      const params = new URLSearchParams(location.search);
+      const storyUrl = params.get("story") || "../../my_jericho/tests/data/905.z5";
+      const filename = storyUrl.split("/").pop() || "story.z5";
+      const requireMetadata = !params.has("story") || params.get("metadata") === "1";
+      const response = await fetch(storyUrl);
+      if (!response.ok) throw new Error(`Story request failed: ${response.status}`);
+
+      const engine = await JerichoEngine.create(window.createJericho, {
+        locateFile: (name) => `../build/${name}`,
+      });
+      const opening = engine.load(new Uint8Array(await response.arrayBuffer()), filename);
+      const turn = engine.step("look");
+      const playerLocation = engine.playerLocation();
+      const inventory = engine.inventory();
+      if (requireMetadata && !playerLocation?.name) throw new Error("Player location is unavailable");
+      const save = engine.save();
+      engine.step("wait");
+      const restored = engine.restore(save);
+      engine.close();
+
+      result.dataset.status = "passed";
+      result.textContent = JSON.stringify({
+        story: filename,
+        openingLength: opening.length,
+        turnLength: turn.observation.length,
+        location: playerLocation?.name || null,
+        inventory: inventory.map((item) => item.name),
+        saveBytes: save.length,
+        restoredMoves: restored.moves,
+      });
+    } catch (error) {
+      result.dataset.status = "failed";
+      result.textContent = error.stack || error.message;
+    }
+  </script>
+</body>
+</html>

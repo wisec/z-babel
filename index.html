@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Z-Babel Standalone</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <h1>Z-Babel</h1>
+        <span id="story-name" data-i18n="loadingStory">Loading story...</span>
+      </div>
+      <div class="toolbar" aria-label="Game controls" data-i18n-aria-label="gameControls">
+        <label class="file-button" for="story-file" data-i18n="openStory" data-i18n-title="openStoryTip">Open story</label>
+        <input id="story-file" type="file" accept=".z3,.z4,.z5,.z6,.z7,.z8,.dat" hidden>
+        <button id="resume" type="button" disabled data-i18n="resume" data-i18n-title="resumeTip">Resume</button>
+        <button id="save" type="button" disabled data-i18n="save" data-i18n-title="saveTip">Save</button>
+        <button id="restore" type="button" disabled data-i18n="restore" data-i18n-title="restoreTip">Restore</button>
+        <button id="export-save" type="button" disabled data-i18n="exportSave" data-i18n-title="exportSaveTip">Export</button>
+        <label class="file-button disabled" id="import-label" for="import-save" data-i18n="importSave" data-i18n-title="importSaveTip">Import</label>
+        <input id="import-save" type="file" accept=".zbabelsave,.zaisave,application/json" hidden disabled>
+        <label class="theme-control">
+          <span class="sr-only" data-i18n="theme">Theme</span>
+          <select id="theme" aria-label="Theme" data-i18n-title="themeTip">
+            <option value="system" selected data-i18n="systemTheme">System</option>
+            <option value="light" data-i18n="lightTheme">Light</option>
+            <option value="dark" data-i18n="darkTheme">Dark</option>
+          </select>
+        </label>
+        <button id="settings" type="button" data-i18n="settings" data-i18n-title="settingsTip">Settings</button>
+        <button id="help" type="button" data-i18n="help" data-i18n-title="helpTip">Help</button>
+        <button id="restart" class="danger" type="button" disabled data-i18n="restart" data-i18n-title="restartTip">Restart</button>
+      </div>
+    </header>
+
+    <section class="workspace">
+      <section class="play-pane" aria-label="Story" data-i18n-aria-label="story">
+        <div id="story" class="story empty" tabindex="0" data-i18n="openStoryPrompt">Open a local Z-machine story to begin.</div>
+        <output id="notice" class="status-bar" aria-live="polite" data-i18n="loadingInterpreter">Loading interpreter...</output>
+        <form id="command-form" class="command-form">
+          <label class="sr-only" for="command" data-i18n="command">Command</label>
+          <input id="command" autocomplete="off" placeholder="Type a command" disabled data-i18n-placeholder="commandPlaceholder">
+          <button id="voice" class="quiet voice-button" type="button" aria-pressed="false" disabled data-i18n="speak">Speak</button>
+          <button id="send" type="submit" disabled data-i18n="send" data-i18n-title="sendTip">Send</button>
+        </form>
+      </section>
+
+      <aside class="side-pane">
+        <section class="panel status-panel">
+          <h2 data-i18n="status">Status</h2>
+          <dl>
+            <div><dt data-i18n="room">Room</dt><dd id="room">-</dd></div>
+            <div><dt data-i18n="score">Score</dt><dd id="score">-</dd></div>
+            <div><dt data-i18n="moves">Moves</dt><dd id="moves">-</dd></div>
+          </dl>
+        </section>
+
+        <section class="panel inventory-panel">
+          <h2 data-i18n="inventory">Inventory</h2>
+          <ul id="inventory"><li data-i18n="empty">Empty</li></ul>
+        </section>
+
+        <section class="panel map-panel">
+          <div class="panel-heading">
+            <h2 data-i18n="map">Map</h2>
+            <button id="fit-map" class="quiet" type="button" disabled data-i18n="fit" data-i18n-title="fitMapTip">Fit</button>
+          </div>
+          <div id="map" class="map empty" data-i18n="noRooms">No rooms explored.</div>
+        </section>
+
+        <details id="debug-panel" class="panel debug-panel">
+          <summary data-i18n="interpreterHistory">Interpreter history</summary>
+          <div id="debug-scroll">
+            <pre id="debug-history"></pre>
+          </div>
+        </details>
+      </aside>
+    </section>
+  </main>
+
+  <dialog id="settings-dialog">
+    <form id="settings-form">
+      <div class="dialog-heading">
+        <h2 data-i18n="translationSettings">Translation settings</h2>
+        <button class="quiet" type="button" id="close-settings" aria-label="Close settings" data-i18n="close" data-i18n-title="closeTip">Close</button>
+      </div>
+      <label>
+        <span data-i18n="targetLanguage">Target language</span>
+        <select id="target-language" required>
+          <option value="Italian" selected>Italiano</option>
+          <option value="English">English</option>
+          <option value="French">Francais</option>
+          <option value="German">Deutsch</option>
+          <option value="Spanish">Espanol</option>
+          <option value="Portuguese">Portugues</option>
+          <option value="Dutch">Nederlands</option>
+          <option value="Polish">Polski</option>
+          <option value="Romanian">Romana</option>
+          <option value="Greek">Ellinika</option>
+          <option value="Russian">Russkii</option>
+          <option value="Ukrainian">Ukrainska</option>
+          <option value="Turkish">Turkce</option>
+          <option value="Arabic">Al-Arabiyya</option>
+          <option value="Hebrew">Ivrit</option>
+          <option value="Hindi">Hindi</option>
+          <option value="Bengali">Bangla</option>
+          <option value="Chinese (Simplified)">Chinese (Simplified)</option>
+          <option value="Chinese (Traditional)">Chinese (Traditional)</option>
+          <option value="Japanese">Japanese</option>
+          <option value="Korean">Korean</option>
+        </select>
+      </label>
+      <label>
+        <span data-i18n="uiLanguage">UI language</span>
+        <select id="ui-language" required>
+          <option value="target" selected data-i18n="sameAsTarget">Same as target language</option>
+          <option value="Italian">Italiano</option>
+          <option value="English">English</option>
+        </select>
+      </label>
+      <div class="settings-field">
+        <div class="field-heading">
+          <label for="api-key" data-i18n="apiKey">Gemini API key</label>
+          <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" data-i18n="getApiKey" data-i18n-title="getApiKeyTip">Get API key</a>
+        </div>
+        <input id="api-key" type="password" autocomplete="off" spellcheck="false">
+        <p class="field-help" data-i18n="apiKeyHelp">
+          Create an authorization key in Google AI Studio, copy it, and paste it here.
+          It is used for translation, voice input, and text to speech. See the
+          Google key guide.
+        </p>
+      </div>
+      <label>
+        <span data-i18n="model">Model</span>
+        <select id="model" required>
+          <option value="gemini-3.6-flash" selected>Gemini 3.6 Flash</option>
+          <option value="gemini-3.5-flash">Gemini 3.5 Flash</option>
+          <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite</option>
+        </select>
+      </label>
+      <label class="check-row">
+        <input id="remember-key" type="checkbox">
+        <span data-i18n="rememberKey">Remember API key in this browser</span>
+      </label>
+      <label class="check-row">
+        <input id="autosend-speech" type="checkbox">
+        <span data-i18n="autosendSpeech">Auto-send on speak</span>
+      </label>
+      <label class="check-row">
+        <input id="tts-enabled" type="checkbox">
+        <span data-i18n="ttsEnabled">Read adventure output aloud</span>
+      </label>
+      <div class="dialog-actions">
+        <button class="quiet" type="button" id="cancel-settings" data-i18n="cancel" data-i18n-title="cancelTip">Cancel</button>
+        <button type="submit" data-i18n="apply" data-i18n-title="applyTip">Apply</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="help-dialog">
+    <div class="dialog-content">
+      <div class="dialog-heading">
+        <h2 data-i18n="helpAbout">Help & About</h2>
+        <button class="quiet" type="button" id="close-help" aria-label="Close help" data-i18n="close" data-i18n-title="closeTip">Close</button>
+      </div>
+      <section class="help-section">
+        <h3 data-i18n="quickStart">Quick start</h3>
+        <ul>
+          <li data-i18n="helpOpen">Open a local Z-machine story, or use the bundled default story.</li>
+          <li data-i18n="helpSettings">Choose the target language and add a Gemini API key in Settings.</li>
+          <li data-i18n="helpCommand">Type commands in the input box and press Send.</li>
+          <li data-i18n="helpHistory">Use the up and down arrow keys to browse command history.</li>
+          <li data-i18n="helpVoice">Click Speak, or hold the left Shift key while speaking, for voice input.</li>
+          <li data-i18n="helpSaves">Save, restore, export, or import browser saves from the toolbar.</li>
+          <li data-i18n="helpPanels">Use the map and inventory panels to track explored rooms and carried items.</li>
+        </ul>
+      </section>
+      <section class="help-section">
+        <h3 data-i18n="about">About</h3>
+        <p>
+          Created by Stefano <code>Wisec</code> Di Paola.
+          <a href="mailto:steve.wisec@gmail.com">steve.wisec@gmail.com</a>
+        </p>
+      </section>
+    </div>
+  </dialog>
+
+  <script src="vendor/cytoscape-3.33.4.min.js"></script>
+  <script src="build/jericho.js?v=2"></script>
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>
