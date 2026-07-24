@@ -1,7 +1,7 @@
 EMCC ?= emcc
 NODE ?= $(shell command -v node)
 DEBUG_FLAGS ?=
-FROTZ := ../my_jericho/frotz
+FROTZ := my_jericho/frotz
 SRC := $(FROTZ)/src
 BUILD := build
 
@@ -45,6 +45,7 @@ test: smoke
 	$(NODE) test/speech.test.mjs
 	$(NODE) test/tts.test.mjs
 	$(NODE) test/translation.test.mjs
+	$(NODE) test/locale.test.mjs
 
 clean:
 	$(RM) $(BUILD)/jericho.js $(BUILD)/jericho.wasm
