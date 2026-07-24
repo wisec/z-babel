@@ -1,6 +1,6 @@
 # Z-Babel
 
-Z-Babel is a Z-Interpreter based text adventure engine that uses AI to make classic parser-based text adventures playable
+Z-Babel is a Z-Interpreter based text adventure engine [HISTORY.md] that uses AI to make classic parser-based text adventures playable
 through modern language interaction.
 
 Instead of forcing the player to guess terse English commands like `take lamp`
@@ -74,7 +74,7 @@ elsewhere, for example `./launch.sh 0.0.0.0` or `launch.bat 0.0.0.0`.
 
 The bundled story loads automatically. Use **Open story** to choose another
 local story file. Infocom-style interactive fiction games can be found through
-[IFDB](https://ifdb.org/#games).
+[IFDB](https://ifdb.org/#games), [The Obsessively Complete Infocom Catalog](https://eblong.com/infocom/) or [Z-Machine-Games](https://github.com/BYU-PCCL/z-machine-games).
 
 ## Playing
 
