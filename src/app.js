@@ -621,7 +621,7 @@ function loadSettings() {
   return {
     language: setting(LANGUAGE_KEY) || "Italian",
     uiLanguage: setting(UI_LANGUAGE_KEY) || "target",
-    model: setting(MODEL_KEY) || "gemini-3.6-flash",
+    model: setting(MODEL_KEY) || "gemini-3.5-flash-lite",
     theme: setting(THEME_KEY) || "system",
     autosendSpeech: setting(AUTOSEND_SPEECH_KEY) === "true",
     ttsEnabled: setting(TTS_ENABLED_KEY) === "true",
