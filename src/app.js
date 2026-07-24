@@ -5,6 +5,7 @@ import { SessionStorage, decodePortableSave, encodePortableSave } from "./storag
 import { arrayBufferToBase64, SpeechRecorder } from "./speech.js";
 import { GeminiTranslator } from "./translation.js?v=2";
 import { GeminiTTS } from "./tts.js";
+import { renderLimitedMarkdown } from "./markdown.js";
 
 const DEFAULT_STORY_URL = new URL("../stories/905.z5", import.meta.url);
 const MAX_RECORDING_MS = 15000;
@@ -15,6 +16,7 @@ const MODEL_KEY = "zbabel-gemini-model";
 const UI_LANGUAGE_KEY = "zbabel-ui-language";
 const AUTOSEND_SPEECH_KEY = "zbabel-autosend-speech";
 const TTS_ENABLED_KEY = "zbabel-tts-enabled";
+const MARKDOWN_OUTPUT_KEY = "zbabel-markdown-output";
 const THEME_KEY = "zbabel-theme";
 const LEGACY_KEY_PREFIX = "zai-";
 const SUPPORTED_UI_LANGUAGES = new Set([
@@ -286,6 +288,7 @@ function openSettings() {
   elements["remember-key"].checked = settings.rememberKey;
   elements["autosend-speech"].checked = settings.autosendSpeech;
   elements["tts-enabled"].checked = settings.ttsEnabled;
+  elements["markdown-output"].checked = settings.markdownOutput;
   elements["settings-dialog"].showModal();
 }
 
@@ -301,17 +304,19 @@ elements["settings-form"].addEventListener("submit", (event) => {
     const apiKey = elements["api-key"].value.trim();
     const autosendSpeech = elements["autosend-speech"].checked;
     const ttsEnabled = elements["tts-enabled"].checked;
+    const markdownOutput = elements["markdown-output"].checked;
     if (ttsEnabled && !apiKey) {
       throw new Error(t("apiKeyTtsRequired"));
     }
     settings = {
-      ...settings, language, uiLanguage, model, apiKey, autosendSpeech, ttsEnabled, rememberKey: elements["remember-key"].checked,
+      ...settings, language, uiLanguage, model, apiKey, autosendSpeech, ttsEnabled, markdownOutput, rememberKey: elements["remember-key"].checked,
     };
     localStorage.setItem(LANGUAGE_KEY, language);
     localStorage.setItem(UI_LANGUAGE_KEY, uiLanguage);
     localStorage.setItem(MODEL_KEY, model);
     localStorage.setItem(AUTOSEND_SPEECH_KEY, String(autosendSpeech));
     localStorage.setItem(TTS_ENABLED_KEY, String(ttsEnabled));
+    localStorage.setItem(MARKDOWN_OUTPUT_KEY, String(markdownOutput));
     localStorage.setItem(REMEMBER_KEY_KEY, String(settings.rememberKey));
     if (settings.rememberKey) localStorage.setItem(API_KEY_KEY, apiKey);
     else localStorage.removeItem(API_KEY_KEY);
@@ -359,10 +364,12 @@ async function render(snapshot) {
     fail(error);
   }
   elements.story.classList.remove("empty");
-  elements.story.textContent = view.history.map((item) => {
+  const storyText = view.history.map((item) => {
     const prefix = item.command ? `> ${item.userCommand || item.command}\n` : "";
     return `${prefix}${item.text}`;
   }).join("\n\n");
+  if (settings.markdownOutput) elements.story.innerHTML = renderLimitedMarkdown(storyText);
+  else elements.story.textContent = storyText;
   elements.story.scrollTop = elements.story.scrollHeight;
   elements["story-name"].textContent = view.storyName;
   elements.room.textContent = view.status.room;
@@ -403,7 +410,7 @@ async function translateSnapshot(snapshot) {
       text: await translator.translateOutput(item.text, item.command),
     }))),
     translateRoomName(snapshot.status.room),
-    Promise.all(snapshot.inventory.map((item) => translator.translateOutput(item))),
+    Promise.all(snapshot.inventory.map((item) => translator.translateObjectName(item))),
     Promise.all(snapshot.map.rooms.map(async (item) => ({
       ...item,
       name: await translateRoomName(item.name),
@@ -647,6 +654,7 @@ function loadSettings() {
     theme: setting(THEME_KEY) || "system",
     autosendSpeech: setting(AUTOSEND_SPEECH_KEY) === "true",
     ttsEnabled: setting(TTS_ENABLED_KEY) === "true",
+    markdownOutput: setting(MARKDOWN_OUTPUT_KEY) === "true",
     apiKey,
     rememberKey: rememberKey == null ? true : rememberKey === "true",
   };

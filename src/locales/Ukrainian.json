@@ -126,5 +126,6 @@
   "voiceReady": "Voice command transcribed. Review it, then press Send.",
   "voiceSend": "Voice command transcribed. Sending...",
   "voiceTitle": "Hold left Shift or click to speak",
-  "wait": "Чекати"
+  "wait": "Чекати",
+  "markdownOutput": "Add Markdown emphasis to translated output"
 }

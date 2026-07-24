@@ -45,6 +45,7 @@ test: smoke
 	$(NODE) test/speech.test.mjs
 	$(NODE) test/tts.test.mjs
 	$(NODE) test/translation.test.mjs
+	$(NODE) test/markdown.test.mjs
 	$(NODE) test/locale.test.mjs
 
 clean:

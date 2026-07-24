@@ -126,5 +126,6 @@
   "voiceReady": "Comando vocale trascritto. Controllalo, poi premi Invia.",
   "voiceSend": "Comando vocale trascritto. Invio...",
   "voiceTitle": "Tieni premuto Shift sinistro o clicca per parlare",
-  "wait": "Attendi"
+  "wait": "Attendi",
+  "markdownOutput": "Aggiungi enfasi Markdown all'output tradotto"
 }

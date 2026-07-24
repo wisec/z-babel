@@ -1,14 +1,15 @@
 export const GEMINI_MODELS = ["gemini-3.5-flash-lite", "gemini-3.6-flash", "gemini-3.5-flash"];
 export const GEMINI_MODEL = GEMINI_MODELS[0];
-const PROMPT_VERSION = "python-prompts-v1";
+const PROMPT_VERSION = "python-prompts-v3";
 
 export class GeminiTranslator {
-  constructor({ apiKey = "", language = "English", model = GEMINI_MODEL, storyId = "", cache, fetchImpl = fetch } = {}) {
+  constructor({ apiKey = "", language = "English", model = GEMINI_MODEL, storyId = "", cache, markdownOutput = false, fetchImpl = fetch } = {}) {
     this.apiKey = apiKey.trim();
     this.language = language.trim() || "English";
     this.model = model.trim() || GEMINI_MODEL;
     this.storyId = storyId;
     this.cache = cache;
+    this.markdownOutput = markdownOutput;
     this.fetchImpl = fetchImpl.bind(globalThis);
     this.pending = new Map();
   }
@@ -36,17 +37,23 @@ export class GeminiTranslator {
     return command;
   }
 
-  async translateOutput(text, command = "") {
+  async translateOutput(text, command = "", { markdownOutput = this.markdownOutput } = {}) {
     if (!text || !this.enabled) return text;
     this.#requireKey();
     const prompt = command ? `Command: ${command}\nText: ${text}\n` : text;
-    return this.#translate("output", outputSystemPrompt(this.language), prompt, prompt);
+    return this.#translate("output", outputSystemPrompt(this.language, markdownOutput), prompt, prompt, markdownOutput);
   }
 
   async translateRoomName(text) {
     if (!text || !this.enabled) return text;
     this.#requireKey();
     return this.#translate("room", roomNameSystemPrompt(this.language), text, text);
+  }
+
+  async translateObjectName(text) {
+    if (!text || !this.enabled) return text;
+    this.#requireKey();
+    return this.#translate("object", objectNameSystemPrompt(this.language), text, text, false);
   }
 
   async transcribeAudio(data, mimeType = "audio/wav") {
@@ -56,15 +63,16 @@ export class GeminiTranslator {
       {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-goog-api-key": this.apiKey },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: speechSystemPrompt(this.language) }] },
-          contents: [{
+          body: JSON.stringify({
+            system_instruction: { parts: [{ text: speechSystemPrompt(this.language) }] },
+            contents: [{
             role: "user",
             parts: [
               { text: "Transcribe the attached player command." },
               { inline_data: { mime_type: mimeType, data } },
             ],
           }],
+          generationConfig: { temperature: 0 },
         }),
       },
     );
@@ -75,9 +83,10 @@ export class GeminiTranslator {
     return transcript.replace(/^```(?:text)?\s*|\s*```$/gi, "").trim();
   }
 
-  async #translate(direction, systemPrompt, userPrompt, source) {
+  async #translate(direction, systemPrompt, userPrompt, source, markdownOutput = this.markdownOutput) {
+    const style = direction === "output" && markdownOutput ? "markdown" : "plain";
     const cacheId = JSON.stringify([
-      this.storyId, direction, this.language.toLowerCase(), this.model, PROMPT_VERSION, source,
+      this.storyId, direction, this.language.toLowerCase(), this.model, PROMPT_VERSION, style, source,
     ]);
     const cached = await this.cache?.getTranslation(cacheId);
     if (cached) return cached;
@@ -92,6 +101,7 @@ export class GeminiTranslator {
           body: JSON.stringify({
             system_instruction: { parts: [{ text: systemPrompt }] },
             contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+            generationConfig: { temperature: 0 },
           }),
         },
       );
@@ -138,14 +148,22 @@ export function commandUsesDictionary(command, dictionary) {
     || [...known].some((entry) => entry.length >= 6 && word.startsWith(entry)));
 }
 
-export function outputSystemPrompt(language) {
-  const base = `You are an expert English-to-${language} translator for Infocom interactive fiction. Preserve the tone of the original.
+export function outputSystemPrompt(language, markdownOutput = false) {
+  const markdown = markdownOutput ? `
+You are a Text Adventure expert and writer/editor capable of adding emphasis simply by using bolding, punctuation, or underlining to help the reader understand and speed up reading at a single glance. I will give you a text and you, without changing absolutely any words, will add modifiers like bold, underline, lists, etc., that Markdown allows.
+Rules for markdown:
+- **Rooms/Locations**: Underline using HTML (<u>Room</u>).
+- **Directions & Objects**: Bold (**text**).
+- **places to go**: Underline using HTML.
+- **Lists**: Format sequences as bullet lists.` : "";
+  const prompt = `You are an expert English-to-${language} translator for Infocom interactive fiction. Preserve the tone of the original.
 Translate into ${language}. Be precise, but keep a narrative and detailed style. Do not omit any part of the source text.
 Preserve punctuation and text structure where possible, because they may contain important nuance for the reader.
-Speak directly to the reader.
-Do not explain the translation. Return only the translation, and translate only the Text field without adding the command.`;
-  if (language.toLowerCase() !== "italian") return base;
-  return `${base}
+Speak directly to the reader.${markdown}
+Do not explain the translation. Return only the translation, and translate only the Text field without adding the command.
+No added text, just the translation!`;
+  if (language.toLowerCase() !== "italian") return prompt;
+  return `${prompt}
 Example:
 Input: Terminal Room
 This is a large room crammed with computer terminals, small computers, and printers. An exit leads south. Banners, posters, and signs festoon the walls. Most of the tables are covered with waste paper, old pizza boxes, and empty Coke cans. There are usually a lot of people here, but tonight it's almost deserted.
@@ -182,6 +200,13 @@ Fork -> Bivio
 Clearing -> Radura
 Landing -> Pianerottolo
 Gallery -> Galleria`;
+}
+
+export function objectNameSystemPrompt(language) {
+  return `Translate this interactive fiction inventory object name from English to ${language}.
+Keep it short and natural for an inventory list.
+Do not add Markdown.
+Do not explain the translation. Return only the translated object name.`;
 }
 
 export function speechSystemPrompt(language) {
