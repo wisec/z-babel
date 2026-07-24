@@ -1,36 +1,40 @@
-# Z-Babel Standalone
+# Z-Babel
 
-Z-Babel Standalone uses AI to make classic parser-based text adventures playable
-through modern language interaction. Instead of forcing the player to guess terse
-English commands like `take lamp` or `go north`, it lets them **type** or **speak** more
-natural instructions in their own language, translates those instructions into
-canonical commands for the Z-machine interpreter, then translates the game's
-response back for the player.
+Z-Babel is a Z-Interpreter based text adventure engine that uses AI to make classic parser-based text adventures playable
+through modern language interaction.
 
-The goal is not to replace the original game logic with an AI storyteller. The
-original deterministic interpreter still runs the adventure. AI is the language
-layer around it: translation, conversational command normalization, speech input,
+Instead of forcing the player to guess terse English commands like `take lamp`
+or `go north`, Z-Babel lets them **type** or **speak** more natural instructions
+in their own language.
+
+The AI layer translates those instructions into canonical commands for the
+Z-machine interpreter, then translates the game's response back for the player.
+
+The original game logic is not replaced by an AI storyteller. The deterministic
+interpreter still runs the adventure; AI only handles the language layer around
+it: translation, conversational command normalization, speech input,
 text-to-speech, and localized UI.
 
 This makes old interactive fiction more approachable for players who do not want
 to fight the parser in English. They can describe intent in a more natural way,
 while the game still receives the precise command form it was written for.
 
-The app is static: there is no server side application and no backend account. Story
-files, saves, transcripts, map state, translation cache, and generated speech
-audio stay in the browser.
+The app is self contained: there is no server-side application and no backend account.
+Story files, saves, transcripts, map state, translation cache, and generated
+speech audio stay in the browser.
+
+Try it here: [https://wisec.github.io/z-babel/](https://wisec.github.io/z-babel/)
+
 
 ## What It Does
 
-- Lets the player type or speak natural, conversational commands in their
-  language, then translates them into canonical English commands the Z-machine
-  interpreter can understand.
-- Translates adventure output, room names, UI labels, tooltips, and status text
-  so the whole play session can happen in the target language.
-- Uses Gemini speech-to-text for spoken commands.
-- Uses Gemini text-to-speech for reading adventure output aloud.
-- Preserves the original parser adventure rules by sending only normalized
-  English commands to the interpreter.
+- Accepts natural, conversational commands typed or spoken by the player.
+- Translates those commands into English parser commands the game understands.
+- Translates adventure output, room names, UI labels, tooltips, and status text.
+- Supports Gemini speech-to-text for voice commands.
+- Supports Gemini text-to-speech for spoken narration.
+- Preserves the original parser rules by sending only normalized English
+  commands to the interpreter.
 - Keeps browser autosaves, manual checkpoints, portable save export/import, and
   restart.
 - Tracks status, inventory, command history, interpreter debug output, and an
@@ -38,29 +42,29 @@ audio stay in the browser.
 
 ## Quick Start
 
-Build the WebAssembly interpreter:
+1. Build the WebAssembly interpreter:
 
-```bash
-make wasm
-```
+   ```bash
+   make wasm
+   ```
 
-Serve this directory:
+2. Serve this directory:
 
-```bash
-./launch.sh
-```
+   ```bash
+   ./launch.sh
+   ```
 
-On Windows, run:
+   On Windows, run:
 
-```bat
-launch.bat
-```
+   ```bat
+   launch.bat
+   ```
 
-The launcher prints the exact URL. Normally it is:
+3. Open the URL printed by the launcher. Normally it is:
 
-```text
-http://127.0.0.1:8000/
-```
+   ```text
+   http://127.0.0.1:8000/
+   ```
 
 Both launchers bind to `127.0.0.1` by default and automatically choose the next
 free port if `8000` is already in use. Pass a bind address to expose the server
@@ -72,14 +76,20 @@ local story file. Infocom-style interactive fiction games can be found through
 
 ## Playing
 
-Type a short parser command, a more conversational instruction, or a command in
+**Commands**
+
+Type/say a short parser command, a more conversational instruction, or a command in
 the target language, then press **Send**. Z-Babel translates the player-facing
 input into a canonical English command before it reaches the interpreter, so the
 game still behaves like the original adventure.
 
+**Controls**
+
 Use the toolbar to save, restore, export, import, restart, open settings, or
 open help. On mobile, controls live in the side menu. Mobile play is designed
 for landscape orientation.
+
+**Saves**
 
 The browser keeps an autosave for resume and a separate manual checkpoint.
 Exported `.zbabelsave` files can be imported after loading the same story file.
@@ -87,19 +97,26 @@ Older `.zaisave` imports are still accepted.
 
 ## Translation And Speech
 
-Open **Settings**, choose a target language, and add a Gemini API key. Italian
-is selected by default, and the language menu also includes English plus 19
-other languages. Gemini is used for the AI language layer: translating player
-commands into interpreter commands, translating game output back to the player,
-transcribing spoken commands, and generating spoken narration.
+Open **Settings**, choose a target language, and add a Gemini API key.
 
-Typed English mode is offline and does not require an API key but if you want translation, natural language processing,
-voice input and text-to-speech Gemini will be used and it will require the API key. You can create
-one in [Google AI Studio](https://aistudio.google.com/app/apikey).
+Italian is selected by default. The language menu also includes English plus 19
+other languages.
+
+Gemini is used for:
+
+- translating player commands into interpreter commands;
+- translating game output back to the player;
+- transcribing spoken commands;
+- generating spoken narration.
+
+Typed English mode is offline and does not require an API key. Translation,
+natural-language command handling, voice input, and text-to-speech require
+Gemini. You can create a key in
+[Google AI Studio](https://aistudio.google.com/app/apikey).
 
 The key stays in memory session unless **Remember API key in this browser** is enabled (default).
-Translations are cached in IndexedDB by story, direction, language, model,
-prompt version, and source text.
+Translations are cached in IndexedDB by story, direction, language, model, prompt
+version, and source text.
 
 For voice input, hold the **left Shift key** while speaking, or use the
 **Speak/Stop** button. Recording stops automatically after 15 seconds.
@@ -128,11 +145,11 @@ target-language menu has a matching locale file.
 ## Developer Setup
 
 Requirements:
-
-- Emscripten (`emcc`)
+- Emscripten (`emcc`) 
 - Make
 - Node.js
 - Python, only for the local launch scripts above
+- Jericho/Frotz requirements are not detailed.
 
 Build:
 
@@ -219,6 +236,6 @@ development through [GitHub Sponsors](https://github.com/sponsors/wisec).
 
 ## License Notes
 
-The standalone distribution includes vendored Frotz/Jericho code. Check the
+The distribution includes vendored Frotz/Jericho code. Check the
 licenses in `my_jericho/` before publishing or redistributing builds, and keep
 source availability obligations in mind for public releases.
