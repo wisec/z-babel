@@ -46,6 +46,28 @@ const UI_LANGUAGE_CODES = {
   Japanese: "ja",
   Korean: "ko",
 };
+const BROWSER_LANGUAGE_CODES = {
+  ar: "Arabic",
+  bn: "Bengali",
+  de: "German",
+  el: "Greek",
+  en: "English",
+  es: "Spanish",
+  fr: "French",
+  he: "Hebrew",
+  hi: "Hindi",
+  it: "Italian",
+  iw: "Hebrew",
+  ja: "Japanese",
+  ko: "Korean",
+  nl: "Dutch",
+  pl: "Polish",
+  pt: "Portuguese",
+  ro: "Romanian",
+  ru: "Russian",
+  tr: "Turkish",
+  uk: "Ukrainian",
+};
 const elements = Object.fromEntries([...document.querySelectorAll("[id]")].map((node) => [node.id, node]));
 const storage = new SessionStorage();
 const mapView = new MapView(elements.map);
@@ -619,7 +641,7 @@ function loadSettings() {
   const apiKey = setting(API_KEY_KEY) || "";
   const rememberKey = setting(REMEMBER_KEY_KEY);
   return {
-    language: setting(LANGUAGE_KEY) || "Italian",
+    language: setting(LANGUAGE_KEY) || browserLanguage(),
     uiLanguage: setting(UI_LANGUAGE_KEY) || "target",
     model: setting(MODEL_KEY) || "gemini-3.5-flash-lite",
     theme: setting(THEME_KEY) || "system",
@@ -628,6 +650,19 @@ function loadSettings() {
     apiKey,
     rememberKey: rememberKey == null ? true : rememberKey === "true",
   };
+}
+
+function browserLanguage() {
+  const languages = navigator.languages?.length ? navigator.languages : [navigator.language];
+  for (const language of languages) {
+    const tag = String(language || "").toLowerCase();
+    if (tag.startsWith("zh")) {
+      return /(?:hant|tw|hk|mo)/.test(tag) ? "Chinese (Traditional)" : "Chinese (Simplified)";
+    }
+    const match = BROWSER_LANGUAGE_CODES[tag.split("-")[0]];
+    if (match) return match;
+  }
+  return "English";
 }
 
 function setting(key) {
