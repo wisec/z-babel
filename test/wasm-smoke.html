@@ -14,7 +14,7 @@
     const result = document.querySelector("#result");
     try {
       const params = new URLSearchParams(location.search);
-      const storyUrl = params.get("story") || "../../my_jericho/tests/data/905.z5";
+      const storyUrl = params.get("story") || "../my_jericho/tests/data/905.z5";
       const filename = storyUrl.split("/").pop() || "story.z5";
       const requireMetadata = !params.has("story") || params.get("metadata") === "1";
       const response = await fetch(storyUrl);

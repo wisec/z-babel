@@ -2,8 +2,8 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 
-const root = path.resolve(__dirname, "../..");
-const build = path.join(root, "standalone/build");
+const root = path.resolve(__dirname, "..");
+const build = path.join(root, "build");
 const storyArgument = process.argv[2];
 const story = path.resolve(storyArgument || path.join(root, "my_jericho/tests/data/905.z5"));
 
